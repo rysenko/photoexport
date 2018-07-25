@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+const picturesPath = path.join(process.env.HOME, 'Pictures');
+
+const targetPath = './Export at ' + new Date().toISOString().substr(0, 10);
+fs.mkdirSync(targetPath);
+
+const libraries = fs.readdirSync(picturesPath).filter(f => f.endsWith('.photoslibrary'));
+if (libraries.length !== 1) {
+    return console.error('Looking for exactly one Photo Library');
+}
+const libraryPath = path.join(picturesPath, libraries[0], 'Masters');
+const years = fs.readdirSync(libraryPath);
+for (const year of years) {
+    const yearPath = path.join(libraryPath, year);
+    const months = fs.readdirSync(yearPath);
+    for (const month of months) {
+        console.log('Exporting', `${year}-${month}`);
+        const monthPath = path.join(yearPath, month);
+        const dates = fs.readdirSync(monthPath);
+        for (const date of dates) {
+            const datePath = path.join(monthPath, date);
+            const targetDateFolder = path.join(targetPath, `${year}-${month}-${date}`);
+            fs.mkdirSync(targetDateFolder);
+            const batches = fs.readdirSync(datePath);
+            for (const batch of batches) {
+                const batchPath = path.join(datePath, batch);
+                const files = fs.readdirSync(batchPath);
+                for (const file of files) {
+                    const filePath = path.join(batchPath, file);
+                    fs.copyFileSync(filePath, path.join(targetDateFolder, file));
+                }
+            }
+        }
+    }
+}
+console.log('Done');

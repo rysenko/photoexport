@@ -1,0 +1,8 @@
+{
+  "name": "photoexport",
+  "version": "1.0.0",
+  "dependencies": {},
+  "directories": {
+    "bin": "./bin"
+  }
+}
